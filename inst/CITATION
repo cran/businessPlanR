@@ -1,0 +1,14 @@
+bibentry("Manual",
+    title="businessPlanR: Simple Modelling Tools for Business Plans",
+    author="Meik Michalke",
+    year="2023",
+    note="(Version 0.1-0)",
+    url="https://www.c3s.cc",
+
+    textVersion =
+    paste("Michalke, M. (2023). ",
+        "businessPlanR: Simple Modelling Tools for Business Plans (Version 0.1-0). ",
+        "Available from https://www.c3s.cc",
+        sep=""),
+
+    mheader = "To cite businessPlanR in publications use:")

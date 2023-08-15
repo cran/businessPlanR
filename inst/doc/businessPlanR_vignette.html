@@ -1,0 +1,3487 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="m.eik michalke" />
+
+<meta name="date" content="2023-08-14" />
+
+<title>The businessPlanR Package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>$(document).ready(function(){
+    if (typeof $('[data-toggle="tooltip"]').tooltip === 'function') {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+    if ($('[data-toggle="popover"]').popover === 'function') {
+        $('[data-toggle="popover"]').popover();
+    }
+});
+</script>
+<style type="text/css">
+.lightable-minimal {
+border-collapse: separate;
+border-spacing: 16px 1px;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-minimal td {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal th {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal thead tr:last-child th {
+border-bottom: 2px solid #00000050;
+empty-cells: hide;
+}
+.lightable-minimal tbody tr:first-child td {
+padding-top: 0.5em;
+}
+.lightable-minimal.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-minimal.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic {
+border-top: 0.16em solid #111111;
+border-bottom: 0.16em solid #111111;
+width: 100%;
+margin-bottom: 10px;
+margin: 10px 5px;
+}
+.lightable-classic tfoot tr td {
+border: 0;
+}
+.lightable-classic tfoot tr:first-child td {
+border-top: 0.14em solid #111111;
+}
+.lightable-classic caption {
+color: #222222;
+}
+.lightable-classic td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic thead tr:last-child th {
+border-bottom: 0.10em solid #111111;
+}
+.lightable-classic.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic-2 {
+border-top: 3px double #111111;
+border-bottom: 3px double #111111;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-classic-2 tfoot tr td {
+border: 0;
+}
+.lightable-classic-2 tfoot tr:first-child td {
+border-top: 3px double #111111;
+}
+.lightable-classic-2 caption {
+color: #222222;
+}
+.lightable-classic-2 td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic-2 th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic-2 tbody tr:last-child td {
+border-bottom: 3px double #111111;
+}
+.lightable-classic-2 thead tr:last-child th {
+border-bottom: 1px solid #111111;
+}
+.lightable-classic-2.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic-2.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #EEE;
+border-collapse: collapse;
+margin-bottom: 10px;
+}
+.lightable-material tfoot tr td {
+border: 0;
+}
+.lightable-material tfoot tr:first-child td {
+border-top: 1px solid #EEE;
+}
+.lightable-material th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+}
+.lightable-material td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+border-top: 1px solid #eeeeee;
+}
+.lightable-material.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #ddd;
+}
+.lightable-material-dark {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #FFFFFF12;
+border-collapse: collapse;
+margin-bottom: 10px;
+background-color: #363640;
+}
+.lightable-material-dark tfoot tr td {
+border: 0;
+}
+.lightable-material-dark tfoot tr:first-child td {
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF60;
+}
+.lightable-material-dark td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF;
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark.lightable-hover tbody tr:hover {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody tr:nth-child(even) {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material-dark.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #FFFFFF12;
+}
+.lightable-paper {
+width: 100%;
+margin-bottom: 10px;
+color: #444;
+}
+.lightable-paper tfoot tr td {
+border: 0;
+}
+.lightable-paper tfoot tr:first-child td {
+border-top: 1px solid #00000020;
+}
+.lightable-paper thead tr:last-child th {
+color: #666;
+vertical-align: bottom;
+border-bottom: 1px solid #00000020;
+line-height: 1.15em;
+padding: 10px 5px;
+}
+.lightable-paper td {
+vertical-align: middle;
+border-bottom: 1px solid #00000010;
+line-height: 1.15em;
+padding: 7px 5px;
+}
+.lightable-paper.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-paper.lightable-striped tbody tr:nth-child(even) {
+background-color: #00000008;
+}
+.lightable-paper.lightable-striped tbody td {
+border: 0;
+}
+</style>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+<style type="text/css">
+  p.abstract{
+    text-align: center;
+    font-weight: bold;
+  }
+  div.abstract{
+    margin: auto;
+    width: 90%;
+  }
+</style>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The businessPlanR Package</h1>
+<h4 class="author">m.eik michalke</h4>
+<h4 class="date">2023-08-14</h4>
+<div class="abstract">
+<p class="abstract">Abstract</p>
+<p>Learn how to construct and visualize business plans in R. This
+package provides some tools that, although sometimes rather simple, can
+be used to build an interactive model of your business activity.</p>
+</div>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#basic-ideas">Basic ideas</a></li>
+<li><a href="#example-case">Example case</a>
+<ul>
+<li><a href="#defining-transaction-types">Defining transaction
+types</a></li>
+<li><a href="#one-object-to-hold-them-all">One object to hold them
+all</a></li>
+<li><a href="#first-transactions">First transactions</a></li>
+<li><a href="#populating-the-operations-object">Populating the
+<code>operations</code> object</a></li>
+<li><a href="#special-transaction-cases">Special transaction
+cases</a></li>
+<li><a href="#simple-modelling">Simple modelling</a></li>
+<li><a href="#add-more-data">Add more data</a></li>
+<li><a href="#special-transactions">Special transactions</a>
+<ul>
+<li><a href="#investments-and-depreciation-schedules">Investments and
+depreciation schedules</a></li>
+<li><a href="#loans-and-interest">Loans and interest</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#cash-flow-liquidity-plans">Cash flow (liquidity)
+plans</a></li>
+<li><a href="#dynamic-modelling">Dynamic modelling</a>
+<ul>
+<li><a href="#modelling-sales">Modelling sales</a></li>
+</ul></li>
+<li><a href="#discussing-numbers-with-shiny">Discussing numbers with
+Shiny</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The <code>businessPlanR</code> package is the result of the <a href="https://www.c3s.cc">Cultural Commons Collecting Society’s</a>
+(C3S) need for a comprehensive business plan in order to apply for
+admission at the DPMA. Business plans can be a bit like looking into a
+crystal ball, especially when you’re trying something completely new
+with your business. The more we got into the interrelated details, the
+more we wanted a tool that would allow us to model very specific aspects
+of our business case, using data we had gathered from surveys of our
+members, and to be able to change any aspect of the whole calculation
+and see how it affected everything else. We also wanted to see what it
+would look like if, for example, things went on like this for the next
+five or ten years, rather than just the three years we were supposed to
+deliver.</p>
+<p>That way we could easily look at which factors had the most impact on
+our plans and which were less critical. Flexibility was key, so this
+package doesn’t try to impose too many constraints on a business plan.
+On the other hand, this probably means that a bit more work is needed to
+get any results at all.</p>
+<p>We hope that the package has remained generic enough for others to
+find it useful.</p>
+</div>
+<div id="basic-ideas" class="section level1">
+<h1>Basic ideas</h1>
+<p>The package provides some S4 classes, methods and a bunch of
+functions for repeating tasks. Things have been kept quite abstract to
+be versatile. For example, when it comes to the flow of money, we
+basically only distinguish between money coming in (<em>revenue</em>)
+and money going out (<em>expense</em>). A this level we don’t
+distinguish between, e. g., costs, investments or interest. This is
+because these classifications can change between contexts, while the
+amount of money remains the same. So it’s up to us to treat a particular
+<em>expense</em> as an investment in our depreciation plan. This will
+become clearer as you work through the example.</p>
+<p>The main workflow is</p>
+<ul>
+<li>to define all the relevant <strong>types of revenue and
+expense</strong> transactions for our business case,</li>
+<li>write <strong>lists that model</strong> which of these cash flows
+are relevant to which aspect of our plan,</li>
+<li>and construct <strong>objects</strong> containing all the respective
+cash flows.</li>
+</ul>
+<p>These objects are used for the calculations, the lists define where
+the results of the calculations are visible, and the types simply ensure
+that we always know what specific transaction we are dealing with.</p>
+</div>
+<div id="example-case" class="section level1">
+<h1>Example case</h1>
+<p>For this vignette, let’s take an example case we want to model, a
+small greengrocer’s in Germany called <em>Saftladen</em>. It is planned
+to open its doors in 2024 and we would like to plan its first three
+years of business. The example is set in Germany because we don’t know
+about specific for business plan practices in other countries. Adapt it
+to your needs.</p>
+<div id="defining-transaction-types" class="section level2">
+<h2>Defining transaction types</h2>
+<p>Our new <em>Saftladen</em> will sell fruit (»Obst«) and vegetables
+(»Gemüse«). It will also offer T-shirts with its logo (»Merchandise«)
+and it plans to take out a loan (»Kreditaufnahme«). These are all
+sources of revenue for our business, so our plan starts by defining them
+as types of revenue:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set_types</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">types=</span><span class="fu">list</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Obst&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.1</span>,<span class="fl">0.9</span>,<span class="fl">0.2</span>,<span class="fl">0.8</span>),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Gemüse&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.2</span>,<span class="fl">0.9</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Merchandise&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.3</span>,<span class="fl">0.8</span>,<span class="fl">0.3</span>,<span class="fl">0.8</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Kreditaufnahme&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.3</span>,<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.8</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">class=</span><span class="st">&quot;revenue&quot;</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Saftladen&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><em>»What about those <code>rgb()</code> colors?«</em> you might ask.
+Transaction types are defined as a named list of colors. These colors
+are used by some of the package’s plotting methods to provide a quick
+visual overview. If you don’t use them, just set them all to white or
+whatever. The really important thing here is that <strong>each income
+source must have a unique named entry as a revenue here</strong>. This
+also forces you to think about these sources early on.</p>
+<p>This set of revenue types is named <code>&quot;Saftladen&quot;</code>. The name
+allows you to define several of these sets in parallel, e. g. if you’re
+modeling two businesses at the same time.</p>
+<p>Note that this is <em>not assigned to an object</em>. Instead,
+<code>set_types()</code> is actually a wrapper for
+<code>options()</code> and adds this information to the options of the
+current session, as a named list called <code>businessPlanR</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="st">&quot;businessPlanR&quot;</span>)</span></code></pre></div>
+<pre><code>## $businessPlanR
+## $businessPlanR$Saftladen
+## $businessPlanR$Saftladen$types
+## $businessPlanR$Saftladen$types$revenue
+## $businessPlanR$Saftladen$types$revenue$Obst
+## [1] &quot;#1AE633CC&quot;
+## 
+## $businessPlanR$Saftladen$types$revenue$Gemüse
+## [1] &quot;#33E666CC&quot;
+## 
+## $businessPlanR$Saftladen$types$revenue$Merchandise
+## [1] &quot;#4DCC4DCC&quot;
+## 
+## $businessPlanR$Saftladen$types$revenue$Kreditaufnahme
+## [1] &quot;#4DB333CC&quot;</code></pre>
+<p>As for our expenses, we’re expecting to pay our employees (»Löhne und
+Gehälter«), social security contributions (»Sozialabgaben«), purchase
+goods (»Waren«), infrastructure (»Infrastruktur«), depreciation
+(»Abschreibung«), loan repayment (»Kredittilgung«), interest (»Zinsen«),
+and taxes (»Steuern«):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set_types</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">types=</span><span class="fu">list</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Löhne und Gehälter&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Sozialabgaben&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.7</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Waren&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.7</span>,<span class="fl">0.3</span>,<span class="fl">0.5</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Infrastruktur&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.75</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Abschreibung&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.9</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Kredittilgung&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.9</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Zinsen&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.9</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Steuern&quot;</span><span class="ot">=</span><span class="fu">rgb</span>(<span class="fl">0.9</span>,<span class="fl">0.2</span>,<span class="fl">0.4</span>,<span class="fl">0.8</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">class=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Saftladen&quot;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Consequently, <strong>each source of cash outflow must have a
+uniquely named entry as an expense here</strong>.</p>
+</div>
+<div id="one-object-to-hold-them-all" class="section level2">
+<h2>One object to hold them all</h2>
+<p>Before we look at individual transactions, we create an object of
+class <code>operations</code>. You might think of this as the closest
+thing you have to the tabs in Excel spreadsheets you may have worked
+with in the past, as it collects all sorts of financial movements in a
+structured way.</p>
+<p>This <code>operations</code> object is like your complete business
+case, and it’s what most of the methods in this package expect as input:
+You throw them everything you’ve got so they can pick out the relevant
+bits.</p>
+<p>This object also defines the time period your business plan will
+cover:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>saftladen_2024_2026 <span class="ot">&lt;-</span> <span class="fu">operations</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">period=</span><span class="fu">c</span>(<span class="st">&quot;2024.01&quot;</span>, <span class="st">&quot;2026.12&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><code>businessPlanR</code> uses months as the smallest time
+resolution.</p>
+</div>
+<div id="first-transactions" class="section level2">
+<h2>First transactions</h2>
+<p>With all revenue and expense types already set, we can now define the
+corresponding financial transactions. The methods we’ll use first are
+<code>revenue()</code> and <code>expense()</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By default, revenues are repeated every month until</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># the value changes.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>rev_merch_2024_2026 <span class="ot">&lt;-</span> <span class="fu">revenue</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Merchandise&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Merch&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;T-Shirts&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.03&quot;</span><span class="ot">=</span><span class="dv">30</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.08&quot;</span><span class="ot">=</span><span class="dv">40</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.03&quot;</span><span class="ot">=</span><span class="dv">50</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.09&quot;</span><span class="ot">=</span><span class="dv">70</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.02&quot;</span><span class="ot">=</span><span class="dv">90</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.07&quot;</span><span class="ot">=</span><span class="dv">100</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.10&quot;</span><span class="ot">=</span><span class="dv">110</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># We plan to produce our T-shirts in January each year.</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Since these expenses should not be repeated every month,</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># we can set missing=&quot;0&quot;; alternatives are &quot;rep&quot; for repeat</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># (default) or &quot;interpol&quot; for automatic interpolation.</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>exp_merch_2024_2026 <span class="ot">&lt;-</span> <span class="fu">expense</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Waren&quot;</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Merch&quot;</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;T-Shirts&quot;</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing=</span><span class="st">&quot;0&quot;</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">200</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">400</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">600</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Let’s look at the financial values of these objects. This can be done
+using <code>get_value()</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_value</span>(rev_merch_2024_2026)</span></code></pre></div>
+<pre><code>##          type category     name 2024.03 2024.04 2024.05 2024.06 2024.07 2024.08
+## 1 Merchandise    Merch T-Shirts      30      30      30      30      30      40
+##   2024.09 2024.10 2024.11 2024.12 2025.01 2025.02 2025.03 2025.04 2025.05 2025.06
+## 1      40      40      40      40      40      40      50      50      50      50
+##   2025.07 2025.08 2025.09 2025.10 2025.11 2025.12 2026.01 2026.02 2026.03 2026.04
+## 1      50      50      70      70      70      70      70      90      90      90
+##   2026.05 2026.06 2026.07 2026.08 2026.09 2026.10
+## 1      90      90     100     100     100     110</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_value</span>(exp_merch_2024_2026)</span></code></pre></div>
+<pre><code>##    type category     name 2024.01 2024.02 2024.03 2024.04 2024.05 2024.06 2024.07
+## 1 Waren    Merch T-Shirts     200       0       0       0       0       0       0
+##   2024.08 2024.09 2024.10 2024.11 2024.12 2025.01 2025.02 2025.03 2025.04 2025.05
+## 1       0       0       0       0       0     400       0       0       0       0
+##   2025.06 2025.07 2025.08 2025.09 2025.10 2025.11 2025.12 2026.01
+## 1       0       0       0       0       0       0       0     600</code></pre>
+<p>As you can see, <code>revenue()</code> and <code>expense()</code>
+always calculate one entry per month. You can control these calculations
+directly via the <code>missing</code> argument (see the comment in the
+example). It is also possible to set a value with <code>per_use</code>,
+which will not use the numbers as actual financial values but, the
+number of times that value has been used. So if our shirts sell for 10
+bucks and we start selling three shirts a month, this will give us the
+same numbers:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By default, the sales are repeated each month until</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># the value changes.</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>rev_merch_2024_2026 <span class="ot">&lt;-</span> <span class="fu">revenue</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Merchandise&quot;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Merch&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;T-Shirts&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">per_use=</span><span class="dv">10</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.03&quot;</span><span class="ot">=</span><span class="dv">3</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.08&quot;</span><span class="ot">=</span><span class="dv">4</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.03&quot;</span><span class="ot">=</span><span class="dv">5</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.09&quot;</span><span class="ot">=</span><span class="dv">7</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.02&quot;</span><span class="ot">=</span><span class="dv">9</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.07&quot;</span><span class="ot">=</span><span class="dv">10</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.10&quot;</span><span class="ot">=</span><span class="dv">11</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="fu">get_value</span>(rev_merch_2024_2026)</span></code></pre></div>
+<pre><code>##          type category     name 2024.03 2024.04 2024.05 2024.06 2024.07 2024.08
+## 1 Merchandise    Merch T-Shirts      30      30      30      30      30      40
+##   2024.09 2024.10 2024.11 2024.12 2025.01 2025.02 2025.03 2025.04 2025.05 2025.06
+## 1      40      40      40      40      40      40      50      50      50      50
+##   2025.07 2025.08 2025.09 2025.10 2025.11 2025.12 2026.01 2026.02 2026.03 2026.04
+## 1      50      50      70      70      70      70      70      90      90      90
+##   2026.05 2026.06 2026.07 2026.08 2026.09 2026.10
+## 1      90      90     100     100     100     110</code></pre>
+<p>The <code>get_value()</code> method can also show quarterly and
+yearly totals (<code>&quot;month&quot;</code> is just the default):</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_value</span>(rev_merch_2024_2026, <span class="at">resolution=</span><span class="st">&quot;quarter&quot;</span>)</span></code></pre></div>
+<pre><code>##          type category     name 2024.Q1 2024.Q2 2024.Q3 2024.Q4 2025.Q1 2025.Q2
+## 1 Merchandise    Merch T-Shirts      30      90     110     120     130     150
+##   2025.Q3 2025.Q4 2026.Q1 2026.Q2 2026.Q3 2026.Q4
+## 1     170     210     250     270     300     110</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_value</span>(exp_merch_2024_2026, <span class="at">resolution=</span><span class="st">&quot;year&quot;</span>)</span></code></pre></div>
+<pre><code>##    type category     name 2024 2025 2026
+## 1 Waren    Merch T-Shirts  200  400  600</code></pre>
+</div>
+<div id="populating-the-operations-object" class="section level2">
+<h2>Populating the <code>operations</code> object</h2>
+<p>At the moment, our two transactions are not yet part of our business
+case. We need to add them to our <code>operations</code> object:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> rev_merch_2024_2026</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> exp_merch_2024_2026</span></code></pre></div>
+<p>Note that both transactions do not cover the full period we have
+defined: Missing months are assumed to have a value of zero. Also, we
+don’t really need individual transaction objects, we can assign the
+output of both <code>revenue()</code> and <code>expense()</code>
+directly to <code>update_operations()&lt;-</code> or even
+<code>operations(...)</code>.</p>
+<p>With these few functions, you should already be able to write your
+own wrapper functions to implement many of the financial movements you
+need to cover. Because you can assign financial values to each month
+individually, you are free to write your own algorithms for whatever
+complex cash flows you assume, and combine all the results in an
+<code>operations</code> object.</p>
+<p>There are also some additional functions to help you with very common
+tasks (or at least we’ve come across them so often that we’ve written
+functions for them):</p>
+<ul>
+<li><code>first_last()</code> creates a list of two elements from
+January of the first given year to December of the last, both with the
+same amount specified.</li>
+<li><code>growth()</code> calculates the differences between successive
+values in a numerical vector.</li>
+<li><code>regularly()</code> creates lists of recurring financial
+transactions for given years (useful, for example, to define quarterly
+transactions, which may even have different amounts).</li>
+<li><code>regularly_delayed()</code> extends <code>regularly()</code> to
+cover cases where you know the annual total of transactions, but they
+don’t start at the beginning of the year.</li>
+<li><code>calc_staff()</code> calculates the number of staff needed to
+complete a given task.</li>
+<li><code>fin_needs()</code> tries to estimate your capital needs from
+the cash flow.</li>
+</ul>
+</div>
+<div id="special-transaction-cases" class="section level2">
+<h2>Special transaction cases</h2>
+<p>There are also some additional object classes that cover additional
+types of transactions:</p>
+<ul>
+<li><code>loan()</code> defines loans with interest and repayment
+schedule.</li>
+<li><code>depreciation()</code> defines the depreciation schedule for
+defined items, i. e. your inventory.</li>
+<li><code>transaction_plan()</code> calculates complete repayment and
+depreciation schedules from single or multiple <code>loan</code> or
+<code>depreciation</code> objects according to the specifics defined
+with these objects.</li>
+</ul>
+<p>You can compare the <code>transaction_plan</code> class to
+<code>operations</code>, as both are structured collections of multiple
+objects. There’s also an <code>update_plan()&lt;-</code> method to add
+or replace objects in existing <code>transaction_plan</code>
+collections, similar to <code>update_operations()&lt;-</code>.</p>
+</div>
+<div id="simple-modelling" class="section level2">
+<h2>Simple modelling</h2>
+<p>Our goal, of course, it to have nice tables for our income statement
+or liquidity plan. Obviously, we can’t just turn the
+<code>operations</code> object into a table for this, but have to decide
+which of the statements are relevant for a particular type of table.
+What’s more, these are usually not just single large tables, but are
+structured into (probably even nested) sections.</p>
+<p>So we need to define the structure for the tables we need, including
+the relevant transactions and their place in a table. This is done with
+the functions <code>table_model()</code> (which can do some validity
+checking) and <code>model_node()</code> (which is used »inside«
+<code>table_model()</code> for nested models. Don’t wonder too much
+about the term <em>model</em> here, we could have called it
+<em>template</em> or something.</p>
+<p>Let’s sketch a very simple model that subtracts expenses from
+revenues to get an income statement:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>saftladen_inc_stamt <span class="ot">&lt;-</span> <span class="fu">table_model</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Gross income from various sources</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Bruttoeinnahmen&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">revenue=</span><span class="fu">c</span>(</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Gemüse&quot;</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Merchandise&quot;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Gross revenue, i.e. minus costs of goods</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Bruttoertrag&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">carry=</span><span class="st">&quot;Bruttoeinnahmen&quot;</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">expense=</span><span class="fu">c</span>(</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Waren&quot;</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Gross profit, i.e. minus operating and depreciation expenses</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Betriebsergebnis&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">carry=</span><span class="st">&quot;Bruttoertrag&quot;</span>,</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">expense=</span><span class="fu">c</span>(</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Löhne und Gehälter&quot;</span>,</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Sozialabgaben&quot;</span>,</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Infrastruktur&quot;</span>,</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Abschreibung&quot;</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Operating profit, i.e. minus interest expenses</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Gewinn vor Steuern&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">carry=</span><span class="st">&quot;Betriebsergebnis&quot;</span>,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">expense=</span><span class="fu">c</span>(</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Zinsen&quot;</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Profit after taxes</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Nettogewinn&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">carry=</span><span class="st">&quot;Gewinn vor Steuern&quot;</span>,</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">expense=</span><span class="fu">c</span>(</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;Steuern&quot;</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>As you can see, we’re reusing some of the type names we defined for
+<code>revenue</code> and <code>expense</code>. Each type listed is used
+to calculate the sum for the node (as we call a named list in this
+context) in which it appears, with revenues added and expenses
+subtracted.</p>
+<p>All entries must be named, here <em>»Bruttoeinnahmen«</em> (gross
+revenue) and <em>»Bruttoertrag«</em> (gross profit), as these names will
+be used in the actual table. Each node could contain child nodes (just
+add named objects with <code>model_node()</code>), so more complex
+hierarchical structures can be designed, but let’s keep it simple for
+now.</p>
+<p>Providing <code>valid_types=&quot;Saftladen&quot;</code> allows
+<code>table_model()</code> to check that all revenues and expenses have
+actually been defined, to avoid typos and missing values in our tables.
+Also note the use of <code>carry=&quot;Bruttoeinnahmen&quot;</code> in the second
+node, which references the previous one. The effect of this is that the
+calculated sum of the referenced node is used as the initial value of
+the referencing node when calculating subtotals for each table section,
+before any revenues are added or expenses subtracted.</p>
+<p>With an initial model defined, we can now <em>condense</em> our
+<code>operations</code> object into the tables we need:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">condense</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>##             Position        Type 2024 2025 2026
+## 1    Bruttoeinnahmen Merchandise  350  660  930
+## 2    Bruttoeinnahmen         Sum  350  660  930
+## 3       Bruttoertrag       Waren -200 -400 -600
+## 4       Bruttoertrag         Sum  150  260  330
+## 5   Betriebsergebnis         Sum  150  260  330
+## 6 Gewinn vor Steuern         Sum  150  260  330
+## 7        Nettogewinn         Sum  150  260  330</code></pre>
+<p>Even from this very primitive example, you can see how
+<code>condense()</code> calculates subtotals (where <em>Type</em> is
+<em>Sum</em>) for each section (<em>Position</em>) of our model. Many
+methods in this package support the <code>resolution</code> argument, as
+we’ve already seen with <code>get_value()</code>, and so does
+<code>condense()</code>:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">condense</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;quarter&quot;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>##             Position        Type 2024.Q1 2024.Q2 2024.Q3 2024.Q4 2025.Q1 2025.Q2
+## 1    Bruttoeinnahmen Merchandise      30      90     110     120     130     150
+## 2    Bruttoeinnahmen         Sum      30      90     110     120     130     150
+## 3       Bruttoertrag       Waren    -200       0       0       0    -400       0
+## 4       Bruttoertrag         Sum    -170      90     110     120    -270     150
+## 5   Betriebsergebnis         Sum    -170      90     110     120    -270     150
+## 6 Gewinn vor Steuern         Sum    -170      90     110     120    -270     150
+## 7        Nettogewinn         Sum    -170      90     110     120    -270     150
+##   2025.Q3 2025.Q4 2026.Q1 2026.Q2 2026.Q3 2026.Q4
+## 1     170     210     250     270     300     110
+## 2     170     210     250     270     300     110
+## 3       0       0    -600       0       0       0
+## 4     170     210    -350     270     300     110
+## 5     170     210    -350     270     300     110
+## 6     170     210    -350     270     300     110
+## 7     170     210    -350     270     300     110</code></pre>
+<p>This is just a raw data frame. But we can also use the
+<code>kable_bpR()</code> method on <code>operations</code> objects along
+with a table model to get nicely formatted tables in RMarkdown. The
+methods make heavy use of the <code>kableExtra</code> package:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoeinnahmen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+350 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+660 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+930 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoertrag</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;">
+-200 €
+</td>
+<td style="text-align:right;">
+-400 €
+</td>
+<td style="text-align:right;">
+-600 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+150 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+260 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+330 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Betriebsergebnis</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+150 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+260 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+330 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Gewinn vor Steuern</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+150 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+260 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+330 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Nettogewinn</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+150 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+260 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+330 €
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="add-more-data" class="section level2">
+<h2>Add more data</h2>
+<p>With only one revenue and expense stream, our plan is still not very
+meaningful. So let’s add some more transactions:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apples</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">revenue</span>(</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Äpfel&quot;</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">2200</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.08&quot;</span><span class="ot">=</span><span class="dv">3000</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.09&quot;</span><span class="ot">=</span><span class="dv">3400</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.12&quot;</span><span class="ot">=</span><span class="dv">2600</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">2300</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.08&quot;</span><span class="ot">=</span><span class="dv">3100</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.09&quot;</span><span class="ot">=</span><span class="dv">3500</span>,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.12&quot;</span><span class="ot">=</span><span class="dv">2700</span>,</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">2400</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.08&quot;</span><span class="ot">=</span><span class="dv">3200</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.09&quot;</span><span class="ot">=</span><span class="dv">3600</span>,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.12&quot;</span><span class="ot">=</span><span class="dv">2800</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">expense</span>(</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Waren&quot;</span>,</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Äpfel&quot;</span>,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">1650</span>,</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.08&quot;</span><span class="ot">=</span><span class="dv">2250</span>,</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.09&quot;</span><span class="ot">=</span><span class="dv">2550</span>,</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.12&quot;</span><span class="ot">=</span><span class="dv">1950</span>,</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">1725</span>,</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.08&quot;</span><span class="ot">=</span><span class="dv">2325</span>,</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.09&quot;</span><span class="ot">=</span><span class="dv">2625</span>,</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.12&quot;</span><span class="ot">=</span><span class="dv">2025</span>,</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">1800</span>,</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.08&quot;</span><span class="ot">=</span><span class="dv">2400</span>,</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.09&quot;</span><span class="ot">=</span><span class="dv">2700</span>,</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.12&quot;</span><span class="ot">=</span><span class="dv">2100</span></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Grapes</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">revenue</span>(</span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Trauben&quot;</span>,</span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing=</span><span class="st">&quot;interpol&quot;</span>,</span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">480</span>,</span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">590</span>,</span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">730</span>,</span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.12&quot;</span><span class="ot">=</span><span class="dv">820</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">expense</span>(</span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Waren&quot;</span>,</span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Trauben&quot;</span>,</span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing=</span><span class="st">&quot;interpol&quot;</span>,</span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">340</span>,</span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">410</span>,</span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">510</span>,</span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.12&quot;</span><span class="ot">=</span><span class="dv">580</span></span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Potatoes</span></span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">revenue</span>(</span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Gemüse&quot;</span>,</span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Gemüse&quot;</span>,</span>
+<span id="cb24-65"><a href="#cb24-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Kartoffeln&quot;</span>,</span>
+<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing=</span><span class="st">&quot;interpol&quot;</span>,</span>
+<span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">2440</span>,</span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">2670</span>,</span>
+<span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">2800</span>,</span>
+<span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.12&quot;</span><span class="ot">=</span><span class="dv">2980</span></span>
+<span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-73"><a href="#cb24-73" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">expense</span>(</span>
+<span id="cb24-74"><a href="#cb24-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Waren&quot;</span>,</span>
+<span id="cb24-75"><a href="#cb24-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Gemüse&quot;</span>,</span>
+<span id="cb24-76"><a href="#cb24-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Kartoffeln&quot;</span>,</span>
+<span id="cb24-77"><a href="#cb24-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing=</span><span class="st">&quot;interpol&quot;</span>,</span>
+<span id="cb24-78"><a href="#cb24-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb24-79"><a href="#cb24-79" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2024.01&quot;</span><span class="ot">=</span><span class="dv">1950</span>,</span>
+<span id="cb24-80"><a href="#cb24-80" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2025.01&quot;</span><span class="ot">=</span><span class="dv">2130</span>,</span>
+<span id="cb24-81"><a href="#cb24-81" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.01&quot;</span><span class="ot">=</span><span class="dv">2240</span>,</span>
+<span id="cb24-82"><a href="#cb24-82" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2026.12&quot;</span><span class="ot">=</span><span class="dv">2400</span></span>
+<span id="cb24-83"><a href="#cb24-83" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Let’s look at the updated table:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoeinnahmen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;">
+37.565 €
+</td>
+<td style="text-align:right;">
+40.250 €
+</td>
+<td style="text-align:right;">
+42.900 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Gemüse
+</td>
+<td style="text-align:right;">
+30.545 €
+</td>
+<td style="text-align:right;">
+32.755 €
+</td>
+<td style="text-align:right;">
+34.680 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+68.460 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+73.665 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+78.510 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoertrag</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;">
+-52.455 €
+</td>
+<td style="text-align:right;">
+-56.335 €
+</td>
+<td style="text-align:right;">
+-60.180 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.005 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.330 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.330 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Betriebsergebnis</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.005 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.330 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.330 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Gewinn vor Steuern</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.005 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.330 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.330 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Nettogewinn</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.005 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.330 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.330 €
+</td>
+</tr>
+</tbody>
+</table>
+<p>It now summarises all the goods we have defined so far, grouped by
+<code>type</code> and placed according to our model. If you want to
+examine all the data in more detail, you can use the
+<code>detailed</code> view of the table:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">detailed=</span><span class="cn">TRUE</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="6" style="border-bottom: 1px solid;color: white !important;background-color: grey !important;">
+<strong>Revenue</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;font-style: italic;">
+Merch
+</td>
+<td style="text-align:right;">
+T-Shirts
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;font-style: italic;">
+Obst
+</td>
+<td style="text-align:right;">
+Äpfel
+</td>
+<td style="text-align:right;">
+31.200 €
+</td>
+<td style="text-align:right;">
+32.400 €
+</td>
+<td style="text-align:right;">
+33.600 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;font-style: italic;">
+Obst
+</td>
+<td style="text-align:right;">
+Trauben
+</td>
+<td style="text-align:right;">
+6.365 €
+</td>
+<td style="text-align:right;">
+7.850 €
+</td>
+<td style="text-align:right;">
+9.300 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Gemüse
+</td>
+<td style="text-align:right;font-style: italic;">
+Gemüse
+</td>
+<td style="text-align:right;">
+Kartoffeln
+</td>
+<td style="text-align:right;">
+30.545 €
+</td>
+<td style="text-align:right;">
+32.755 €
+</td>
+<td style="text-align:right;">
+34.680 €
+</td>
+</tr>
+<tr grouplength="4">
+<td colspan="6" style="border-bottom: 1px solid;color: white !important;background-color: grey !important;">
+<strong>Exepense</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;font-style: italic;">
+Merch
+</td>
+<td style="text-align:right;">
+T-Shirts
+</td>
+<td style="text-align:right;">
+-200 €
+</td>
+<td style="text-align:right;">
+-400 €
+</td>
+<td style="text-align:right;">
+-600 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;font-style: italic;">
+Obst
+</td>
+<td style="text-align:right;">
+Äpfel
+</td>
+<td style="text-align:right;">
+-23.400 €
+</td>
+<td style="text-align:right;">
+-24.300 €
+</td>
+<td style="text-align:right;">
+-25.200 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;font-style: italic;">
+Obst
+</td>
+<td style="text-align:right;">
+Trauben
+</td>
+<td style="text-align:right;">
+-4.465 €
+</td>
+<td style="text-align:right;">
+-5.470 €
+</td>
+<td style="text-align:right;">
+-6.540 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;font-style: italic;">
+Gemüse
+</td>
+<td style="text-align:right;">
+Kartoffeln
+</td>
+<td style="text-align:right;">
+-24.390 €
+</td>
+<td style="text-align:right;">
+-26.165 €
+</td>
+<td style="text-align:right;">
+-27.840 €
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="special-transactions" class="section level2">
+<h2>Special transactions</h2>
+<p>As mentioned earlier, the package supports some common special cases
+of transaction plans. The idea here is to define a complete investment
+or loan repayment plan and let the methods of this package select
+relevant aspects of these plans for different tables, such as the profit
+and loss statement or the liquidity plan.</p>
+<div id="investments-and-depreciation-schedules" class="section level3">
+<h3>Investments and depreciation schedules</h3>
+<p>Let’s say our shop needs two new cash registers. We’ll buy one for
+450 € in the first month of our plan, and the second one a year and a
+half later. Let the amortisation period for this type of investment be
+72 months:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>dep_cashreg1 <span class="ot">&lt;-</span> <span class="fu">depreciation</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Abschreibung&quot;</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Laden&quot;</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Kasse 1&quot;</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">amount=</span><span class="dv">450</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">obsolete=</span><span class="dv">72</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">invest_month=</span><span class="st">&quot;2024.01&quot;</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>dep_cashreg2 <span class="ot">&lt;-</span> <span class="fu">depreciation</span>(</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Abschreibung&quot;</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Laden&quot;</span>,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Kasse 2&quot;</span>,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">amount=</span><span class="dv">450</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">obsolete=</span><span class="dv">72</span>,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">invest_month=</span><span class="st">&quot;2025.07&quot;</span>,</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>The objects now contain the full investment and depreciation plans
+for both cash registers. We can add both aspects to our operations
+object separately, but we need to tell <code>update_operations()</code>
+how to handle them:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">as_transaction=</span><span class="fu">list</span>(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;investment&quot;</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Infrastruktur&quot;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;depreciation&quot;</span>,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Abschreibung&quot;</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>) <span class="ot">&lt;-</span> dep_cashreg1</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">as_transaction=</span><span class="fu">list</span>(</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;investment&quot;</span>,</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Infrastruktur&quot;</span></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;depreciation&quot;</span>,</span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Abschreibung&quot;</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>) <span class="ot">&lt;-</span> dep_cashreg2</span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span></span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoeinnahmen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;">
+37.565 €
+</td>
+<td style="text-align:right;">
+40.250 €
+</td>
+<td style="text-align:right;">
+42.900 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Gemüse
+</td>
+<td style="text-align:right;">
+30.545 €
+</td>
+<td style="text-align:right;">
+32.755 €
+</td>
+<td style="text-align:right;">
+34.680 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+68.460 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+73.665 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+78.510 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoertrag</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;">
+-52.455 €
+</td>
+<td style="text-align:right;">
+-56.335 €
+</td>
+<td style="text-align:right;">
+-60.180 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.005 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.330 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.330 €
+</td>
+</tr>
+<tr grouplength="3">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Betriebsergebnis</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Infrastruktur
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+0 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Abschreibung
+</td>
+<td style="text-align:right;">
+-75 €
+</td>
+<td style="text-align:right;">
+-112 €
+</td>
+<td style="text-align:right;">
+-150 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+15.480 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.768 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.180 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Gewinn vor Steuern</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+15.480 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.768 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.180 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Nettogewinn</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+15.480 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.768 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.180 €
+</td>
+</tr>
+</tbody>
+</table>
+<p>We can also combine both objects into one transaction plan to get one
+comprehensive table:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>dep_plan <span class="ot">&lt;-</span> <span class="fu">transaction_plan</span>(<span class="at">plan_type=</span><span class="st">&quot;depreciation&quot;</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">update_plan</span>(dep_plan) <span class="ot">&lt;-</span> dep_cashreg1</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">update_plan</span>(dep_plan) <span class="ot">&lt;-</span> dep_cashreg2</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    dep_plan,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">dep_names=</span><span class="fu">c</span>(</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">investment=</span><span class="st">&quot;Investition&quot;</span>,</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">depreciation=</span><span class="st">&quot;Abschreibung&quot;</span>,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">value=</span><span class="st">&quot;Wert&quot;</span>,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">sum=</span><span class="st">&quot;Summe&quot;</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span>,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">years=</span><span class="dv">2024</span><span class="sc">:</span><span class="dv">2029</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+<th style="text-align:right;">
+2027
+</th>
+<th style="text-align:right;">
+2028
+</th>
+<th style="text-align:right;">
+2029
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+Laden
+</td>
+<td style="text-align:right;font-weight: bold;">
+Kasse 1
+</td>
+<td style="text-align:right;font-style: italic;">
+Investition
+</td>
+<td style="text-align:right;">
+450,00 €
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Laden
+</td>
+<td style="text-align:right;font-weight: bold;">
+Kasse 1
+</td>
+<td style="text-align:right;font-style: italic;">
+Abschreibung
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Laden
+</td>
+<td style="text-align:right;font-weight: bold;">
+Kasse 1
+</td>
+<td style="text-align:right;font-style: italic;">
+Wert
+</td>
+<td style="text-align:right;">
+375,00 €
+</td>
+<td style="text-align:right;">
+300,00 €
+</td>
+<td style="text-align:right;">
+225,00 €
+</td>
+<td style="text-align:right;">
+150,00 €
+</td>
+<td style="text-align:right;">
+75,00 €
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Laden
+</td>
+<td style="text-align:right;font-weight: bold;">
+Kasse 2
+</td>
+<td style="text-align:right;font-style: italic;">
+Investition
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+450,00 €
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Laden
+</td>
+<td style="text-align:right;font-weight: bold;">
+Kasse 2
+</td>
+<td style="text-align:right;font-style: italic;">
+Abschreibung
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+-37,50 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Laden
+</td>
+<td style="text-align:right;font-weight: bold;">
+Kasse 2
+</td>
+<td style="text-align:right;font-style: italic;">
+Wert
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+412,50 €
+</td>
+<td style="text-align:right;">
+337,50 €
+</td>
+<td style="text-align:right;">
+262,50 €
+</td>
+<td style="text-align:right;">
+187,50 €
+</td>
+<td style="text-align:right;">
+112,50 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Investition
+</td>
+<td style="text-align:right;">
+450,00 €
+</td>
+<td style="text-align:right;">
+450,00 €
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Abschreibung
+</td>
+<td style="text-align:right;">
+-75,00 €
+</td>
+<td style="text-align:right;">
+-112,50 €
+</td>
+<td style="text-align:right;">
+-150,00 €
+</td>
+<td style="text-align:right;">
+-150,00 €
+</td>
+<td style="text-align:right;">
+-150,00 €
+</td>
+<td style="text-align:right;">
+-150,00 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Wert
+</td>
+<td style="text-align:right;">
+375,00 €
+</td>
+<td style="text-align:right;">
+712,50 €
+</td>
+<td style="text-align:right;">
+562,50 €
+</td>
+<td style="text-align:right;">
+412,50 €
+</td>
+<td style="text-align:right;">
+262,50 €
+</td>
+<td style="text-align:right;">
+112,50 €
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="loans-and-interest" class="section level3">
+<h3>Loans and interest</h3>
+<p>Similar to investments and depreciation, loans are easy to calculate.
+The profit and loss statement only looks at the interest, but we’ll also
+add the principal rates which we’ll need later for our liquidity
+plan:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>loan_2024 <span class="ot">&lt;-</span> <span class="fu">loan</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Kreditaufnahme&quot;</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Bank&quot;</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Anschubfinanzierung&quot;</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">amount=</span><span class="dv">5000</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">period=</span><span class="dv">60</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">interest=</span><span class="fl">0.075</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_month=</span><span class="st">&quot;2024.01&quot;</span>,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">schedule=</span><span class="fu">c</span>(<span class="st">&quot;amortization&quot;</span>),</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">as_transaction=</span><span class="fu">list</span>(</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;principal&quot;</span>,</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Kredittilgung&quot;</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;expense&quot;</span>,</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;interest&quot;</span>,</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Zinsen&quot;</span></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">to=</span><span class="st">&quot;revenue&quot;</span>,</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">aspect=</span><span class="st">&quot;balance_start&quot;</span>,</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>            <span class="at">type=</span><span class="st">&quot;Kreditaufnahme&quot;</span></span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>) <span class="ot">&lt;-</span> loan_2024</span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span></span>
+<span id="cb30-40"><a href="#cb30-40" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoeinnahmen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;">
+37.565 €
+</td>
+<td style="text-align:right;">
+40.250 €
+</td>
+<td style="text-align:right;">
+42.900 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Gemüse
+</td>
+<td style="text-align:right;">
+30.545 €
+</td>
+<td style="text-align:right;">
+32.755 €
+</td>
+<td style="text-align:right;">
+34.680 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+68.460 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+73.665 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+78.510 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoertrag</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;">
+-52.455 €
+</td>
+<td style="text-align:right;">
+-56.335 €
+</td>
+<td style="text-align:right;">
+-60.180 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.005 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.330 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.330 €
+</td>
+</tr>
+<tr grouplength="3">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Betriebsergebnis</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Infrastruktur
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+0 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Abschreibung
+</td>
+<td style="text-align:right;">
+-75 €
+</td>
+<td style="text-align:right;">
+-112 €
+</td>
+<td style="text-align:right;">
+-150 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+15.480 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.768 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.180 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Gewinn vor Steuern</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Zinsen
+</td>
+<td style="text-align:right;">
+-341 €
+</td>
+<td style="text-align:right;">
+-266 €
+</td>
+<td style="text-align:right;">
+-191 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+15.139 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.502 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.989 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Nettogewinn</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+15.139 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+16.502 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+17.989 €
+</td>
+</tr>
+</tbody>
+</table>
+<p>Similar to the investment and depreciation plans, you could also
+combine several loans into one transaction plan to include them as a
+table. But in our example there is only one loan:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>loan_plan <span class="ot">&lt;-</span> <span class="fu">transaction_plan</span>(<span class="at">plan_type=</span><span class="st">&quot;loan&quot;</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">update_plan</span>(loan_plan) <span class="ot">&lt;-</span> loan_2024</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    loan_plan,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">loan_names=</span><span class="fu">c</span>(</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">balance_start=</span><span class="st">&quot;Restschuld Beginn&quot;</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">interest=</span><span class="st">&quot;Zinsen&quot;</span>,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">principal=</span><span class="st">&quot;Tilgung&quot;</span>,</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">total=</span><span class="st">&quot;Zahlung&quot;</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">cumsum=</span><span class="st">&quot;Kumuliert&quot;</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">balance_remain=</span><span class="st">&quot;Restschuld Ende&quot;</span>,</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">sum=</span><span class="st">&quot;Summe&quot;</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+<th style="text-align:right;">
+2027
+</th>
+<th style="text-align:right;">
+2028
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+Bank
+</td>
+<td style="text-align:right;font-weight: bold;">
+Anschubfinanzierung
+</td>
+<td style="text-align:right;font-style: italic;">
+Restschuld Beginn
+</td>
+<td style="text-align:right;">
+5.000,00 €
+</td>
+<td style="text-align:right;">
+4.000,00 €
+</td>
+<td style="text-align:right;">
+3.000,00 €
+</td>
+<td style="text-align:right;">
+2.000,00 €
+</td>
+<td style="text-align:right;">
+1.000,00 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Bank
+</td>
+<td style="text-align:right;font-weight: bold;">
+Anschubfinanzierung
+</td>
+<td style="text-align:right;font-style: italic;">
+Zinsen
+</td>
+<td style="text-align:right;">
+340,51 €
+</td>
+<td style="text-align:right;">
+265,54 €
+</td>
+<td style="text-align:right;">
+190,56 €
+</td>
+<td style="text-align:right;">
+115,58 €
+</td>
+<td style="text-align:right;">
+40,61 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Bank
+</td>
+<td style="text-align:right;font-weight: bold;">
+Anschubfinanzierung
+</td>
+<td style="text-align:right;font-style: italic;">
+Tilgung
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Bank
+</td>
+<td style="text-align:right;font-weight: bold;">
+Anschubfinanzierung
+</td>
+<td style="text-align:right;font-style: italic;">
+Zahlung
+</td>
+<td style="text-align:right;">
+1.340,47 €
+</td>
+<td style="text-align:right;">
+1.265,50 €
+</td>
+<td style="text-align:right;">
+1.190,52 €
+</td>
+<td style="text-align:right;">
+1.115,54 €
+</td>
+<td style="text-align:right;">
+1.040,57 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Bank
+</td>
+<td style="text-align:right;font-weight: bold;">
+Anschubfinanzierung
+</td>
+<td style="text-align:right;font-style: italic;">
+Kumuliert
+</td>
+<td style="text-align:right;">
+1.340,47 €
+</td>
+<td style="text-align:right;">
+2.605,97 €
+</td>
+<td style="text-align:right;">
+3.796,49 €
+</td>
+<td style="text-align:right;">
+4.912,03 €
+</td>
+<td style="text-align:right;">
+5.952,60 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+Bank
+</td>
+<td style="text-align:right;font-weight: bold;">
+Anschubfinanzierung
+</td>
+<td style="text-align:right;font-style: italic;">
+Restschuld Ende
+</td>
+<td style="text-align:right;">
+4.000,00 €
+</td>
+<td style="text-align:right;">
+3.000,00 €
+</td>
+<td style="text-align:right;">
+2.000,00 €
+</td>
+<td style="text-align:right;">
+1.000,00 €
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Restschuld Beginn
+</td>
+<td style="text-align:right;">
+5.000,00 €
+</td>
+<td style="text-align:right;">
+4.000,00 €
+</td>
+<td style="text-align:right;">
+3.000,00 €
+</td>
+<td style="text-align:right;">
+2.000,00 €
+</td>
+<td style="text-align:right;">
+1.000,00 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Zinsen
+</td>
+<td style="text-align:right;">
+340,51 €
+</td>
+<td style="text-align:right;">
+265,54 €
+</td>
+<td style="text-align:right;">
+190,56 €
+</td>
+<td style="text-align:right;">
+115,58 €
+</td>
+<td style="text-align:right;">
+40,61 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Tilgung
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+<td style="text-align:right;">
+999,96 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Zahlung
+</td>
+<td style="text-align:right;">
+1.340,47 €
+</td>
+<td style="text-align:right;">
+1.265,50 €
+</td>
+<td style="text-align:right;">
+1.190,52 €
+</td>
+<td style="text-align:right;">
+1.115,54 €
+</td>
+<td style="text-align:right;">
+1.040,57 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Kumuliert
+</td>
+<td style="text-align:right;">
+1.340,47 €
+</td>
+<td style="text-align:right;">
+2.605,97 €
+</td>
+<td style="text-align:right;">
+3.796,49 €
+</td>
+<td style="text-align:right;">
+4.912,03 €
+</td>
+<td style="text-align:right;">
+5.952,60 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;font-weight: bold;">
+Summe
+</td>
+<td style="text-align:right;font-style: italic;">
+Restschuld Ende
+</td>
+<td style="text-align:right;">
+4.000,00 €
+</td>
+<td style="text-align:right;">
+3.000,00 €
+</td>
+<td style="text-align:right;">
+2.000,00 €
+</td>
+<td style="text-align:right;">
+1.000,00 €
+</td>
+<td style="text-align:right;">
+<span style="     color: #C0C0C0 !important;"> 0,00 €</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="cash-flow-liquidity-plans" class="section level1">
+<h1>Cash flow (liquidity) plans</h1>
+<p>The steps to create a cash flow plan are simple: Define another model
+to include all the relevant types of revenue and expense, and then call
+<code>kable_bpR(cashflow=TRUE)</code> using that model:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>saftladen_cashflow <span class="ot">&lt;-</span> <span class="fu">table_model</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Einzahlungen&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">revenue=</span><span class="fu">c</span>(</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Gemüse&quot;</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Merchandise&quot;</span>,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Kreditaufnahme&quot;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Auszahlungen&quot;</span><span class="ot">=</span><span class="fu">model_node</span>(</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">expense=</span><span class="fu">c</span>(</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Löhne und Gehälter&quot;</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Sozialabgaben&quot;</span>,</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Infrastruktur&quot;</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Waren&quot;</span>,</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Zinsen&quot;</span>,</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Kredittilgung&quot;</span>,</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Steuern&quot;</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_cashflow,</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span>,</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">cashflow=</span><span class="cn">TRUE</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Begin</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;font-weight: bold;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+0 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+19.215 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+34.829 €
+</td>
+</tr>
+<tr grouplength="5">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Einzahlungen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;">
+37.565 €
+</td>
+<td style="text-align:right;">
+40.250 €
+</td>
+<td style="text-align:right;">
+42.900 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Gemüse
+</td>
+<td style="text-align:right;">
+30.545 €
+</td>
+<td style="text-align:right;">
+32.755 €
+</td>
+<td style="text-align:right;">
+34.680 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Kreditaufnahme
+</td>
+<td style="text-align:right;">
+5.000 €
+</td>
+<td style="text-align:right;">
+0 €
+</td>
+<td style="text-align:right;">
+0 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+73.460 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+73.665 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+78.510 €
+</td>
+</tr>
+<tr grouplength="5">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Auszahlungen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Infrastruktur
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+0 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;">
+-52.455 €
+</td>
+<td style="text-align:right;">
+-56.335 €
+</td>
+<td style="text-align:right;">
+-60.180 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Zinsen
+</td>
+<td style="text-align:right;">
+-341 €
+</td>
+<td style="text-align:right;">
+-266 €
+</td>
+<td style="text-align:right;">
+-191 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Kredittilgung
+</td>
+<td style="text-align:right;">
+-1.000 €
+</td>
+<td style="text-align:right;">
+-1.000 €
+</td>
+<td style="text-align:right;">
+-1.000 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+-54.245 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+-58.050 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+-61.371 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>End</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;font-weight: bold;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+19.215 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+34.829 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+51.969 €
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dynamic-modelling" class="section level1">
+<h1>Dynamic modelling</h1>
+<p>So far we have used fixed numbers in our objects. Sure, that’s just
+an example and it doesn’t really matter if those numbers make sense. But
+if this were your actual business plan, these numbers would represent of
+how you think your business will develop. Nobody expects your
+calculations to predict the future to three decimal places, they should
+be as plausible as possible. Otherwise, your plan may not convince
+readers to invest in your idea.</p>
+<p>Readers might ask themselves: Why do you think you will sell this
+amount of potatoes in a particular month? How did you arrive at these
+figures? And you will often find that when things change (like laws
+affecting your business or interest rates) or you learn new information
+that causes you to adjust your assumptions, you will need to update some
+numbers, which in turn will change your calculations right through to
+the end result. We have written this package to deal with all this
+intuitively.</p>
+<p>Here is how we did it, and it helped us a lot: We used RMarkdown to
+write our business plan. In that document, we explained how we expected
+different aspects of our undertaking to interact, and what initial
+values we knew, or why we thought it was plausible to propose a certain
+value. Since these initial assumptions could change at any time, all
+actual numbers should be defined as a vector or list at the beginning of
+the document and referenced in the text, so that by changing the values
+in that object, you not only update your calculations, but also the
+numbers that appear in the documentation. Finally, we translated these
+expectations into simple functions to calculate the actual numbers that
+would then be used as revenues and expenses.</p>
+<p>This separates the numbers we assume (vector/list) from the
+interactions between the basic aspects of our business we assume
+(functions), i. e. both can be adjusted separately.</p>
+<div id="modelling-sales" class="section level2">
+<h2>Modelling sales</h2>
+<p>Let’s go back to our example and try to do this for our apple sales.
+You have talked to local farmers and studied both the neighbourhood and
+consumer analyses. You have come up with the following figures:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>assumed <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_customers=</span><span class="dv">1860</span>, <span class="co"># number of potential customers?</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_year_1st=</span><span class="dv">25</span>,      <span class="co"># how many of them will buy at our store?</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_year_last=</span><span class="dv">35</span>,     <span class="co"># how will the number progress?</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_demand=</span><span class="dv">30</span>,        <span class="co"># how much will they buy from us?</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">kg_per_customer=</span><span class="fu">c</span>(    <span class="co"># how many Kg were cosumed in recent years?</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">apples=</span><span class="dv">23</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">exp_per_kg=</span><span class="fu">c</span>(         <span class="co"># how much will it cost to buy goods?</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">apples=</span><span class="fl">2.3</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">rev_per_kg=</span><span class="fu">c</span>(         <span class="co"># at what price will we sell?</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">apples=</span><span class="fl">3.49</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>In our business plan, we can now use this list of numbers to explain
+our expectations. The package has a function called
+<code>nice_numbers()</code> to format numbers, round them and add a
+prefix or suffix. So
+<code>nice_numbers(assumed[[&quot;total_customers&quot;]])</code> prints as 1.860,
+<code>nice_numbers(assumed[[&quot;pct_year_1st&quot;]], suffix=&quot;%&quot;)</code> as
+25 %, and
+<code>nice_numbers(assumed[[&quot;exp_per_kg&quot;]][[&quot;apples&quot;]], suffix=&quot;€&quot;, digits=2)</code>
+as 2,30 €:</p>
+<blockquote>
+<p><em>According to the demographic analysis, there are a total of 1.860
+potential customers for the Saftladen. We assume that we will reach 25 %
+of this market in the first year, increasing to 35 % in the third year
+as a result of our marketing efforts. We also assume that our average
+customer will buy 30 % of their annual apple requirements in our store.
+From consumer research in recent years, we know that the total annual
+consumption of apples per person is around 23 Kg on average. We have an
+agreement with local farmers to buy apples at 2,30 € per Kg, and we
+calculate a selling price of 3,49 € per Kg.</em></p>
+</blockquote>
+<p>Great! So how many customers can we expect if these assumptions
+hold?</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>n_customers <span class="ot">&lt;-</span> <span class="cf">function</span>(data, years){</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    customer_pct <span class="ot">&lt;-</span> <span class="fu">seq</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">from=</span>data[[<span class="st">&quot;pct_year_1st&quot;</span>]],</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">to=</span>data[[<span class="st">&quot;pct_year_last&quot;</span>]],</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">length.out=</span><span class="fu">length</span>(years)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">/</span> <span class="dv">100</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> <span class="fu">round</span>(data[[<span class="st">&quot;total_customers&quot;</span>]] <span class="sc">*</span> customer_pct)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(result) <span class="ot">&lt;-</span> years</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(result)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="fu">n_customers</span>(<span class="at">data=</span>assumed, <span class="at">years=</span><span class="dv">2024</span><span class="sc">:</span><span class="dv">2026</span>)</span></code></pre></div>
+<pre><code>## 2024 2025 2026 
+##  465  558  651</code></pre>
+<p>How many Kg of apples will we sell?</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>kg_sale <span class="ot">&lt;-</span> <span class="cf">function</span>(what, data, years){</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    avg_amount_total <span class="ot">&lt;-</span> data[[<span class="st">&quot;kg_per_customer&quot;</span>]][[what]]</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> <span class="fu">round</span>(</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>        avg_amount_total <span class="sc">*</span> </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>        (data[[<span class="st">&quot;pct_demand&quot;</span>]] <span class="sc">/</span> <span class="dv">100</span>) <span class="sc">*</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">n_customers</span>(<span class="at">data=</span>data, <span class="at">years=</span>years)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(result)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kg_sale</span>(<span class="at">what=</span><span class="st">&quot;apples&quot;</span>, <span class="at">data=</span>assumed, <span class="at">years=</span><span class="dv">2024</span><span class="sc">:</span><span class="dv">2026</span>)</span></code></pre></div>
+<pre><code>## 2024 2025 2026 
+## 3208 3850 4492</code></pre>
+<p>Apple season usually is from August to November, so let’s not spread
+this equally across the year:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>spread_sales <span class="ot">&lt;-</span> <span class="cf">function</span>(what, distribution, data, years){</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    yearly_sales <span class="ot">&lt;-</span> <span class="fu">kg_sale</span>(<span class="at">what=</span>what, <span class="at">data=</span>data, <span class="at">years=</span>years)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    distrib <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">as.vector</span>(<span class="fu">sapply</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>        yearly_sales,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>(kg){</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>            kg <span class="sc">*</span> distribution</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    )))</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>(distrib) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">rep</span>(years, <span class="at">each=</span><span class="fu">length</span>(distribution)), <span class="fu">names</span>(distribution))</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(distrib)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>sales_apples_kg <span class="ot">&lt;-</span> <span class="fu">spread_sales</span>(</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">what=</span><span class="st">&quot;apples&quot;</span>,</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">distribution=</span><span class="fu">c</span>(</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;.01&quot;</span><span class="ot">=</span><span class="fl">0.20</span>,</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;.08&quot;</span><span class="ot">=</span><span class="fl">0.27</span>,</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;.09&quot;</span><span class="ot">=</span><span class="fl">0.30</span>,</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;.12&quot;</span><span class="ot">=</span><span class="fl">0.23</span></span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>assumed,</span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">years=</span><span class="dv">2024</span><span class="sc">:</span><span class="dv">2026</span></span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a><span class="co"># multiply by prices</span></span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>(sales_apples_expense <span class="ot">&lt;-</span> <span class="fu">round</span>(sales_apples_kg <span class="sc">*</span> assumed[[<span class="st">&quot;exp_per_kg&quot;</span>]][[<span class="st">&quot;apples&quot;</span>]]))</span></code></pre></div>
+<pre><code>## 2024.01 2024.08 2024.09 2024.12 2025.01 2025.08 2025.09 2025.12 2026.01 2026.08 
+##    1477    1992    2213    1697    1771    2392    2656    2038    2065    2790 
+## 2026.09 2026.12 
+##    3100    2376</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>(sales_apples_revenue <span class="ot">&lt;-</span> <span class="fu">round</span>(sales_apples_kg <span class="sc">*</span> assumed[[<span class="st">&quot;rev_per_kg&quot;</span>]][[<span class="st">&quot;apples&quot;</span>]]))</span></code></pre></div>
+<pre><code>## 2024.01 2024.08 2024.09 2024.12 2025.01 2025.08 2025.09 2025.12 2026.01 2026.08 
+##    2241    3022    3357    2576    2687    3630    4031    3092    3134    4233 
+## 2026.09 2026.12 
+##    4705    3605</code></pre>
+<p>Now we apply these figures to our operations object:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">revenue</span>(</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Äpfel&quot;</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.list=</span><span class="fu">as.list</span>(sales_apples_revenue)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="fu">update_operations</span>(saftladen_2024_2026) <span class="ot">&lt;-</span> <span class="fu">expense</span>(</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">type=</span><span class="st">&quot;Waren&quot;</span>,</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">category=</span><span class="st">&quot;Obst&quot;</span>,</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">name=</span><span class="st">&quot;Äpfel&quot;</span>,</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">valid_types=</span><span class="st">&quot;Saftladen&quot;</span>,</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.list=</span><span class="fu">as.list</span>(sales_apples_expense)</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="fu">kable_bpR</span>(</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    saftladen_2024_2026,</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">model=</span>saftladen_inc_stamt,</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">resolution=</span><span class="st">&quot;year&quot;</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+</th>
+<th style="text-align:right;">
+2024
+</th>
+<th style="text-align:right;">
+2025
+</th>
+<th style="text-align:right;">
+2026
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoeinnahmen</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Obst
+</td>
+<td style="text-align:right;">
+37.721 €
+</td>
+<td style="text-align:right;">
+45.474 €
+</td>
+<td style="text-align:right;">
+53.191 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Gemüse
+</td>
+<td style="text-align:right;">
+30.545 €
+</td>
+<td style="text-align:right;">
+32.755 €
+</td>
+<td style="text-align:right;">
+34.680 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Merchandise
+</td>
+<td style="text-align:right;">
+350 €
+</td>
+<td style="text-align:right;">
+660 €
+</td>
+<td style="text-align:right;">
+930 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+68.616 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+78.889 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+88.801 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Bruttoertrag</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Waren
+</td>
+<td style="text-align:right;">
+-49.722 €
+</td>
+<td style="text-align:right;">
+-56.830 €
+</td>
+<td style="text-align:right;">
+-63.901 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.894 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+22.059 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+24.900 €
+</td>
+</tr>
+<tr grouplength="3">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Betriebsergebnis</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Infrastruktur
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+-450 €
+</td>
+<td style="text-align:right;">
+0 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Abschreibung
+</td>
+<td style="text-align:right;">
+-75 €
+</td>
+<td style="text-align:right;">
+-112 €
+</td>
+<td style="text-align:right;">
+-150 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.369 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+21.496 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+24.750 €
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Gewinn vor Steuern</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;padding-left: 2em;" indentlevel="1">
+Zinsen
+</td>
+<td style="text-align:right;">
+-341 €
+</td>
+<td style="text-align:right;">
+-266 €
+</td>
+<td style="text-align:right;">
+-191 €
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.028 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+21.231 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+24.559 €
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Nettogewinn</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-style: italic;font-weight: bold;padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;font-weight: bold;">
+18.028 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+21.231 €
+</td>
+<td style="text-align:right;font-weight: bold;">
+24.559 €
+</td>
+</tr>
+</tbody>
+</table>
+<p>Our previous revenues and expenses for apples have been replaced by
+<code>update_operations()</code>. Instead of a bunch of numbers that
+were hard to understand, these sales are now transparently derived from
+data that we have explained.</p>
+</div>
+</div>
+<div id="discussing-numbers-with-shiny" class="section level1">
+<h1>Discussing numbers with Shiny</h1>
+<p>Finally, you can use functions like the ones we just wrote in a Shiny
+application. More specifically, if you don’t call methods like
+<code>revenue()</code> or <code>loan()</code> directly, but inside a
+custom function, you can use the same functions in a Shiny app and in
+your RMarkdown document, making sure that all calculations stay in sync.
+That is, you write your calculations in separate R script files that can
+be sourced by both Shiny and RMarkdown.</p>
+<p>It can be very revealing to use such a Shiny app to examine the
+overall impact of changes to the numerical assumptions in your business
+plan. For example, you could use slider controls for each value defined
+in <code>assumed</code> and explore how your business would be affected
+if there were fewer customers than expected or if selling prices
+fell.</p>
+<p>We added a permalink to the Shiny app we used to discuss our business
+model as a team, which included all the configurable parameters. Such a
+Shiny permalink can be turned into a named list using
+<code>businessPlanR</code>’s <code>permalink2list()</code> function,
+which in turn makes it very easy to copy a custom configuration from
+Shiny into an RMarkdown document, so that all calculations and tables
+can be replicated.</p>
+<p>The relevant functions of the <code>businessPlanR</code> package have
+been designed to produce output that should be usable in HTML and LaTeX
+contexts, without the need to adapt the calls.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

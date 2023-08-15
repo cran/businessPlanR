@@ -1,0 +1,773 @@
+---
+title: "The businessPlanR Package"
+author: "m.eik michalke"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+abstract: >
+  Learn how to construct and visualize business plans in R. This package provides some
+  tools that, although sometimes rather simple, can be used to build an interactive
+  model of your business activity.
+vignette: >
+  %\VignetteIndexEntry{The businessPlanR Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8x]{inputenc}
+  \usepackage{apacite}
+## hints for proper formatting:
+# - use e.$\,$g. or i.&#8239;e. to put a thin space between abbreviations
+# - use &shy; for manual hy&shy;phe&shy;na&shy;tion
+# - use \break{} to force a line break in a paragraph
+---
+
+```{r, include=FALSE, cache=FALSE}
+library(businessPlanR)
+```
+```{r, set-options, echo=FALSE, cache=FALSE}
+old_options <- options(width=85)
+```
+
+# Introduction
+
+The `businessPlanR` package is the result of the [Cultural Commons Collecting Society's](https://www.c3s.cc) (C3S) need for a comprehensive business plan in order to apply for admission at the DPMA. Business plans can be a bit like looking into a crystal ball, especially when you're trying something completely new with your business. The more we got into the interrelated details, the more we wanted a tool that would allow us to model very specific aspects of our business case, using data we had gathered from surveys of our members, and to be able to change any aspect of the whole calculation and see how it affected everything else. We also wanted to see what it would look like if, for example, things went on like this for the next five or ten years, rather than just the three years we were supposed to deliver.
+
+That way we could easily look at which factors had the most impact on our plans and which were less critical. Flexibility was key, so this package doesn't try to impose too many constraints on a business plan. On the other hand, this probably means that a bit more work is needed to get any results at all.
+
+We hope that the package has remained generic enough for others to find it useful.
+
+
+# Basic ideas
+
+The package provides some S4 classes, methods and a bunch of functions for repeating tasks. Things have been kept quite abstract to be versatile. For example, when it comes to the flow of money, we basically only distinguish between money coming in (*revenue*) and money going out (*expense*). A this level we don't distinguish between, e.&#8239;g., costs, investments or interest. This is because these classifications can change between contexts, while the amount of money remains the same. So it's up to us to treat a particular *expense* as an investment in our depreciation plan. This will become clearer as you work through the example.
+
+The main workflow is
+
+* to define all the relevant **types of revenue and expense** transactions for our business case,
+* write **lists that model** which of these cash flows are relevant to which aspect of our plan,
+* and construct **objects** containing all the respective cash flows.
+
+These objects are used for the calculations, the lists define where the results of the calculations are visible, and the types simply ensure that we always know what specific transaction we are dealing with.
+
+
+# Example case
+
+For this vignette, let's take an example case we want to model, a small greengrocer's in Germany called *Saftladen*. It is planned to open its doors in 2024 and we would like to plan its first three years of business. The example is set in Germany because we don't know about specific for business plan practices in other countries. Adapt it to your needs.
+
+
+## Defining transaction types
+
+Our new *Saftladen* will sell fruit (»Obst«) and vegetables (»Gemüse«). It will also offer T-shirts with its logo (»Merchandise«) and it plans to take out a loan (»Kreditaufnahme«). These are all sources of revenue for our business, so our plan starts by defining them as types of revenue:
+
+```{r}
+set_types(
+    types=list(
+        "Obst"=rgb(0.1,0.9,0.2,0.8),
+        "Gemüse"=rgb(0.2,0.9,0.4,0.8),
+        "Merchandise"=rgb(0.3,0.8,0.3,0.8),
+        "Kreditaufnahme"=rgb(0.3,0.7,0.2,0.8)
+    ),
+    class="revenue",
+    name="Saftladen"
+)
+```
+
+*»What about those `rgb()` colors?«* you might ask. Transaction types are defined as a named list of colors. These colors are used by some of the package's plotting methods to provide a quick visual overview. If you don't use them, just set them all to white or whatever. The really important thing here is that **each income source must have a unique named entry as a revenue here**. This also forces you to think about these sources early on.
+
+This set of revenue types is named `"Saftladen"`. The name allows you to define several of these sets in parallel, e.&#8239;g. if you're modeling two businesses at the same time.
+
+Note that this is *not assigned to an object*. Instead, `set_types()` is actually a wrapper for `options()` and adds this information to the options of the current session, as a named list called `businessPlanR`:
+
+```{r}
+options("businessPlanR")
+```
+
+As for our expenses, we're expecting to pay our employees (»Löhne und Gehälter«), social security contributions (»Sozialabgaben«), purchase goods (»Waren«), infrastructure (»Infrastruktur«), depreciation (»Abschreibung«), loan repayment (»Kredittilgung«), interest (»Zinsen«), and taxes (»Steuern«):
+
+```{r}
+set_types(
+    types=list(
+        "Löhne und Gehälter"=rgb(0.7,0.2,0.4,0.8),
+        "Sozialabgaben"=rgb(0.7,0.2,0.4,0.8),
+        "Waren"=rgb(0.7,0.3,0.5,0.8),
+        "Infrastruktur"=rgb(0.75,0.2,0.4,0.8),
+        "Abschreibung"=rgb(0.9,0.2,0.4,0.8),
+        "Kredittilgung"=rgb(0.9,0.2,0.4,0.8),
+        "Zinsen"=rgb(0.9,0.2,0.4,0.8),
+        "Steuern"=rgb(0.9,0.2,0.4,0.8)
+    ),
+    class="expense",
+    name="Saftladen"
+)
+```
+
+Consequently, **each source of cash outflow must have a uniquely named entry as an expense here**.
+
+
+## One object to hold them all
+
+Before we look at individual transactions, we create an object of class `operations`. You might think of this as the closest thing you have to the tabs in Excel spreadsheets you may have worked with in the past, as it collects all sorts of financial movements in a structured way.
+
+This `operations` object is like your complete business case, and it's what most of the methods in this package expect as input: You throw them everything you've got so they can pick out the relevant bits.
+
+This object also defines the time period your business plan will cover:
+
+```{r}
+saftladen_2024_2026 <- operations(
+    period=c("2024.01", "2026.12")
+)
+```
+
+`businessPlanR` uses months as the smallest time resolution.
+
+
+## First transactions
+
+With all revenue and expense types already set, we can now define the corresponding financial transactions. The methods we'll use first are `revenue()` and `expense()`:
+
+```{r}
+# By default, revenues are repeated every month until
+# the value changes.
+rev_merch_2024_2026 <- revenue(
+    type="Merchandise",
+    category="Merch",
+    name="T-Shirts",
+    valid_types="Saftladen",
+    "2024.03"=30,
+    "2024.08"=40,
+    "2025.03"=50,
+    "2025.09"=70,
+    "2026.02"=90,
+    "2026.07"=100,
+    "2026.10"=110
+)
+
+# We plan to produce our T-shirts in January each year.
+# Since these expenses should not be repeated every month,
+# we can set missing="0"; alternatives are "rep" for repeat
+# (default) or "interpol" for automatic interpolation.
+exp_merch_2024_2026 <- expense(
+    type="Waren",
+    category="Merch",
+    name="T-Shirts",
+    missing="0",
+    valid_types="Saftladen",
+    "2024.01"=200,
+    "2025.01"=400,
+    "2026.01"=600
+)
+```
+
+Let's look at the financial values of these objects. This can be done using `get_value()`:
+
+```{r}
+get_value(rev_merch_2024_2026)
+get_value(exp_merch_2024_2026)
+```
+
+As you can see, `revenue()` and `expense()` always calculate one entry per month. You can control these calculations directly via the `missing` argument (see the comment in the example). It is also possible to set a value with `per_use`, which will not use the numbers as actual financial values but, the number of times that value has been used. So if our shirts sell for 10 bucks and we start selling three shirts a month, this will give us the same numbers:
+
+```{r}
+# By default, the sales are repeated each month until
+# the value changes.
+rev_merch_2024_2026 <- revenue(
+    type="Merchandise",
+    category="Merch",
+    name="T-Shirts",
+    per_use=10,
+    valid_types="Saftladen",
+    "2024.03"=3,
+    "2024.08"=4,
+    "2025.03"=5,
+    "2025.09"=7,
+    "2026.02"=9,
+    "2026.07"=10,
+    "2026.10"=11
+)
+get_value(rev_merch_2024_2026)
+```
+
+The `get_value()` method can also show quarterly and yearly totals (`"month"` is just the default):
+
+```{r}
+get_value(rev_merch_2024_2026, resolution="quarter")
+get_value(exp_merch_2024_2026, resolution="year")
+```
+
+
+## Populating the `operations` object
+
+At the moment, our two transactions are not yet part of our business case. We need to add them to our `operations` object:
+
+```{r}
+update_operations(saftladen_2024_2026) <- rev_merch_2024_2026
+update_operations(saftladen_2024_2026) <- exp_merch_2024_2026
+```
+
+Note that both transactions do not cover the full period we have defined: Missing months are assumed to have a value of zero. Also, we don't really need individual transaction objects, we can assign the output of both `revenue()` and `expense()` directly to `update_operations()<-` or even `operations(...)`.
+
+With these few functions, you should already be able to write your own wrapper functions to implement many of the financial movements you need to cover. Because you can assign financial values to each month individually, you are free to write your own algorithms for whatever complex cash flows you assume, and combine all the results in an `operations` object.
+
+There are also some additional functions to help you with very common tasks (or at least we've come across them so often that we've written functions for them):
+
+  - `first_last()` creates a list of two elements from January of the first given year to December of the last, both with the same amount specified.
+  - `growth()` calculates the differences between successive values in a numerical vector.
+  - `regularly()` creates lists of recurring financial transactions for given years (useful, for example, to define quarterly transactions, which may even have different amounts).
+  - `regularly_delayed()` extends `regularly()` to cover cases where you know the annual total of transactions, but they don't start at the beginning of the year.
+  - `calc_staff()` calculates the number of staff needed to complete a given task.
+  - `fin_needs()` tries to estimate your capital needs from the cash flow.
+
+
+## Special transaction cases
+
+There are also some additional object classes that cover additional types of transactions:
+
+  - `loan()` defines loans with interest and repayment schedule.
+  - `depreciation()` defines the depreciation schedule for defined items, i.&#8239;e. your inventory.
+  - `transaction_plan()` calculates complete repayment and depreciation schedules from single or multiple `loan` or `depreciation` objects according to the specifics defined with these objects.
+
+You can compare the `transaction_plan` class to `operations`, as both are structured collections of multiple objects. There's also an `update_plan()<-` method to add or replace objects in existing `transaction_plan` collections, similar to `update_operations()<-`.
+
+
+## Simple modelling
+
+Our goal, of course, it to have nice tables for our income statement or liquidity plan. Obviously, we can't just turn the `operations` object into a table for this, but have to decide which of the statements are relevant for a particular type of table. What's more, these are usually not just single large tables, but are structured into (probably even nested) sections.
+
+So we need to define the structure for the tables we need, including the relevant transactions and their place in a table. This is done with the functions `table_model()` (which can do some validity checking) and `model_node()` (which is used »inside« `table_model()` for nested models. Don't wonder too much about the term *model* here, we could have called it *template* or something.
+
+Let's sketch a very simple model that subtracts expenses from revenues to get an income statement:
+
+```{r}
+saftladen_inc_stamt <- table_model(
+    # Gross income from various sources
+    "Bruttoeinnahmen"=model_node(
+        revenue=c(
+            "Obst",
+            "Gemüse",
+            "Merchandise"
+        )
+    ),
+    # Gross revenue, i.e. minus costs of goods
+    "Bruttoertrag"=model_node(
+        carry="Bruttoeinnahmen",
+        expense=c(
+            "Waren"
+        )
+    ),
+    # Gross profit, i.e. minus operating and depreciation expenses
+    "Betriebsergebnis"=model_node(
+        carry="Bruttoertrag",
+        expense=c(
+            "Löhne und Gehälter",
+            "Sozialabgaben",
+            "Infrastruktur",
+            "Abschreibung"
+        )
+    ),
+    # Operating profit, i.e. minus interest expenses
+    "Gewinn vor Steuern"=model_node(
+        carry="Betriebsergebnis",
+        expense=c(
+            "Zinsen"
+        )
+    ),
+    # Profit after taxes
+    "Nettogewinn"=model_node(
+        carry="Gewinn vor Steuern",
+        expense=c(
+          "Steuern"
+        )
+    ),
+    valid_types="Saftladen"
+)
+```
+
+As you can see, we're reusing some of the type names we defined for `revenue` and `expense`. Each type listed is used to calculate the sum for the node (as we call a named list in this context) in which it appears, with revenues added and expenses subtracted.
+
+All entries must be named, here *»Bruttoeinnahmen«* (gross revenue) and *»Bruttoertrag«* (gross profit), as these names will be used in the actual table. Each node could contain child nodes (just add named objects with `model_node()`), so more complex hierarchical structures can be designed, but let's keep it simple for now.
+
+Providing `valid_types="Saftladen"` allows `table_model()` to check that all revenues and expenses have actually been defined, to avoid typos and missing values in our tables. Also note the use of `carry="Bruttoeinnahmen"` in the second node, which references the previous one. The effect of this is that the calculated sum of the referenced node is used as the initial value of the referencing node when calculating subtotals for each table section, before any revenues are added or expenses subtracted.
+
+With an initial model defined, we can now *condense* our `operations` object into the tables we need:
+
+```{r}
+condense(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt
+)
+```
+
+Even from this very primitive example, you can see how `condense()` calculates subtotals (where *Type* is *Sum*) for each section (*Position*) of our model. Many methods in this package support the `resolution` argument, as we've already seen with `get_value()`, and so does `condense()`:
+
+```{r}
+condense(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="quarter"
+)
+```
+
+This is just a raw data frame. But we can also use the `kable_bpR()` method on `operations` objects along with a table model to get nicely formatted tables in RMarkdown. The methods make heavy use of the `kableExtra` package:
+
+```{r}
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="year"
+)
+```
+
+## Add more data
+
+With only one revenue and expense stream, our plan is still not very meaningful. So let's add some more transactions:
+
+```{r}
+# Apples
+update_operations(saftladen_2024_2026) <- revenue(
+    type="Obst",
+    category="Obst",
+    name="Äpfel",
+    valid_types="Saftladen",
+    "2024.01"=2200,
+    "2024.08"=3000,
+    "2024.09"=3400,
+    "2024.12"=2600,
+    "2025.01"=2300,
+    "2025.08"=3100,
+    "2025.09"=3500,
+    "2025.12"=2700,
+    "2026.01"=2400,
+    "2026.08"=3200,
+    "2026.09"=3600,
+    "2026.12"=2800
+)
+update_operations(saftladen_2024_2026) <- expense(
+    type="Waren",
+    category="Obst",
+    name="Äpfel",
+    valid_types="Saftladen",
+    "2024.01"=1650,
+    "2024.08"=2250,
+    "2024.09"=2550,
+    "2024.12"=1950,
+    "2025.01"=1725,
+    "2025.08"=2325,
+    "2025.09"=2625,
+    "2025.12"=2025,
+    "2026.01"=1800,
+    "2026.08"=2400,
+    "2026.09"=2700,
+    "2026.12"=2100
+)
+# Grapes
+update_operations(saftladen_2024_2026) <- revenue(
+    type="Obst",
+    category="Obst",
+    name="Trauben",
+    missing="interpol",
+    valid_types="Saftladen",
+    "2024.01"=480,
+    "2025.01"=590,
+    "2026.01"=730,
+    "2026.12"=820
+)
+update_operations(saftladen_2024_2026) <- expense(
+    type="Waren",
+    category="Obst",
+    name="Trauben",
+    missing="interpol",
+    valid_types="Saftladen",
+    "2024.01"=340,
+    "2025.01"=410,
+    "2026.01"=510,
+    "2026.12"=580
+)
+# Potatoes
+update_operations(saftladen_2024_2026) <- revenue(
+    type="Gemüse",
+    category="Gemüse",
+    name="Kartoffeln",
+    missing="interpol",
+    valid_types="Saftladen",
+    "2024.01"=2440,
+    "2025.01"=2670,
+    "2026.01"=2800,
+    "2026.12"=2980
+)
+update_operations(saftladen_2024_2026) <- expense(
+    type="Waren",
+    category="Gemüse",
+    name="Kartoffeln",
+    missing="interpol",
+    valid_types="Saftladen",
+    "2024.01"=1950,
+    "2025.01"=2130,
+    "2026.01"=2240,
+    "2026.12"=2400
+)
+```
+
+Let's look at the updated table:
+
+```{r}
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="year"
+)
+```
+
+It now summarises all the goods we have defined so far, grouped by `type` and placed according to our model. If you want to examine all the data in more detail, you can use the `detailed` view of the table:
+
+```{r}
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="year",
+    detailed=TRUE
+)
+```
+
+
+## Special transactions
+
+As mentioned earlier, the package supports some common special cases of transaction plans. The idea here is to define a complete investment or loan repayment plan and let the methods of this package select relevant aspects of these plans for different tables, such as the profit and loss statement or the liquidity plan.
+
+
+### Investments and depreciation schedules
+
+Let's say our shop needs two new cash registers. We'll buy one for 450&#8239;€ in the first month of our plan, and the second one a year and a half later. Let the amortisation period for this type of investment be 72 months:
+
+```{r}
+dep_cashreg1 <- depreciation(
+    type="Abschreibung",
+    category="Laden",
+    name="Kasse 1",
+    amount=450,
+    obsolete=72,
+    invest_month="2024.01",
+    valid_types="Saftladen"
+)
+dep_cashreg2 <- depreciation(
+    type="Abschreibung",
+    category="Laden",
+    name="Kasse 2",
+    amount=450,
+    obsolete=72,
+    invest_month="2025.07",
+    valid_types="Saftladen"
+)
+```
+
+The objects now contain the full investment and depreciation plans for both cash registers. We can add both aspects to our operations object separately, but we need to tell `update_operations()` how to handle them:
+
+```{r}
+update_operations(
+    saftladen_2024_2026,
+    as_transaction=list(
+        c(
+            to="expense",
+            aspect="investment",
+            valid_types="Saftladen",
+            type="Infrastruktur"
+        ),
+        c(
+            to="expense",
+            aspect="depreciation",
+            valid_types="Saftladen",
+            type="Abschreibung"
+        )
+    )
+) <- dep_cashreg1
+update_operations(
+    saftladen_2024_2026,
+    as_transaction=list(
+        c(
+            to="expense",
+            aspect="investment",
+            valid_types="Saftladen",
+            type="Infrastruktur"
+        ),
+        c(
+            to="expense",
+            aspect="depreciation",
+            valid_types="Saftladen",
+            type="Abschreibung"
+        )
+    )
+) <- dep_cashreg2
+
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="year"
+)
+```
+
+We can also combine both objects into one transaction plan to get one comprehensive table:
+
+```{r}
+dep_plan <- transaction_plan(plan_type="depreciation")
+update_plan(dep_plan) <- dep_cashreg1
+update_plan(dep_plan) <- dep_cashreg2
+
+kable_bpR(
+    dep_plan,
+    dep_names=c(
+        investment="Investition",
+        depreciation="Abschreibung",
+        value="Wert",
+        sum="Summe"
+    ),
+    resolution="year",
+    years=2024:2029
+)
+```
+
+
+### Loans and interest
+
+Similar to investments and depreciation, loans are easy to calculate. The profit and loss statement only looks at the interest, but we'll also add the principal rates which we'll need later for our liquidity plan:
+
+```{r}
+loan_2024 <- loan(
+    type="Kreditaufnahme",
+    category="Bank",
+    name="Anschubfinanzierung",
+    amount=5000,
+    period=60,
+    interest=0.075,
+    first_month="2024.01",
+    schedule=c("amortization"),
+    valid_types="Saftladen"
+)
+update_operations(
+    saftladen_2024_2026,
+    as_transaction=list(
+        c(
+            to="expense",
+            aspect="principal",
+            valid_types="Saftladen",
+            type="Kredittilgung"
+        ),
+        c(
+            to="expense",
+            aspect="interest",
+            valid_types="Saftladen",
+            type="Zinsen"
+        ),
+        c(
+            to="revenue",
+            aspect="balance_start",
+            valid_types="Saftladen",
+            type="Kreditaufnahme"
+        )
+    )
+) <- loan_2024
+
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="year"
+)
+```
+
+Similar to the investment and depreciation plans, you could also combine several loans into one transaction plan to include them as a table. But in our example there is only one loan:
+
+```{r}
+loan_plan <- transaction_plan(plan_type="loan")
+update_plan(loan_plan) <- loan_2024
+
+kable_bpR(
+    loan_plan,
+    loan_names=c(
+        balance_start="Restschuld Beginn",
+        interest="Zinsen",
+        principal="Tilgung",
+        total="Zahlung",
+        cumsum="Kumuliert",
+        balance_remain="Restschuld Ende",
+        sum="Summe"
+    ),
+    resolution="year"
+)
+```
+
+
+# Cash flow (liquidity) plans
+
+The steps to create a cash flow plan are simple: Define another model to include all the relevant types of revenue and expense, and then call `kable_bpR(cashflow=TRUE)` using that model:
+
+```{r}
+saftladen_cashflow <- table_model(
+    "Einzahlungen"=model_node(
+        revenue=c(
+            "Obst",
+            "Gemüse",
+            "Merchandise",
+            "Kreditaufnahme"
+        )
+    ),
+    "Auszahlungen"=model_node(
+        expense=c(
+            "Löhne und Gehälter",
+            "Sozialabgaben",
+            "Infrastruktur",
+            "Waren",
+            "Zinsen",
+            "Kredittilgung",
+            "Steuern"
+        )
+    )
+)
+
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_cashflow,
+    resolution="year",
+    cashflow=TRUE
+)
+```
+
+
+# Dynamic modelling
+
+So far we have used fixed numbers in our objects. Sure, that's just an example and it doesn't really matter if those numbers make sense. But if this were your actual business plan, these numbers would represent of how you think your business will develop. Nobody expects your calculations to predict the future to three decimal places, they should be as plausible as possible. Otherwise, your plan may not convince readers to invest in your idea.
+
+Readers might ask themselves: Why do you think you will sell this amount of potatoes in a particular month? How did you arrive at these figures? And you will often find that when things change (like laws affecting your business or interest rates) or you learn new information that causes you to adjust your assumptions, you will need to update some numbers, which in turn will change your calculations right through to the end result. We have written this package to deal with all this intuitively.
+
+Here is how we did it, and it helped us a lot: We used RMarkdown to write our business plan. In that document, we explained how we expected different aspects of our undertaking to interact, and what initial values we knew, or why we thought it was plausible to propose a certain value. Since these initial assumptions could change at any time, all actual numbers should be defined as a vector or list at the beginning of the document and referenced in the text, so that by changing the values in that object, you not only update your calculations, but also the numbers that appear in the documentation. Finally, we translated these expectations into simple functions to calculate the actual numbers that would then be used as revenues and expenses.
+
+This separates the numbers we assume (vector/list) from the interactions between the basic aspects of our business we assume (functions), i.&#8239;e. both can be adjusted separately.
+
+## Modelling sales
+
+Let's go back to our example and try to do this for our apple sales. You have talked to local farmers and studied both the neighbourhood and consumer analyses. You have come up with the following figures:
+
+```{r}
+assumed <- list(
+    total_customers=1860, # number of potential customers?
+    pct_year_1st=25,      # how many of them will buy at our store?
+    pct_year_last=35,     # how will the number progress?
+    pct_demand=30,        # how much will they buy from us?
+    kg_per_customer=c(    # how many Kg were cosumed in recent years?
+        apples=23
+    ),
+    exp_per_kg=c(         # how much will it cost to buy goods?
+        apples=2.3
+    ),
+    rev_per_kg=c(         # at what price will we sell?
+        apples=3.49
+    )
+)
+```
+
+In our business plan, we can now use this list of numbers to explain our expectations. The package has a function called `nice_numbers()` to format numbers, round them and add a prefix or suffix. So `nice_numbers(assumed[["total_customers"]])` prints as `r nice_numbers(assumed[["total_customers"]])`, `nice_numbers(assumed[["pct_year_1st"]], suffix="%")` as `r nice_numbers(assumed[["pct_year_1st"]], suffix="%")`, and `nice_numbers(assumed[["exp_per_kg"]][["apples"]], suffix="€", digits=2)` as `r nice_numbers(assumed[["exp_per_kg"]][["apples"]], suffix="€", digits=2)`:
+
+> *According to the demographic analysis, there are a total of `r nice_numbers(assumed[["total_customers"]])` potential customers for the Saftladen. We assume that we will reach `r nice_numbers(assumed[["pct_year_1st"]], suffix="%")` of this market in the first year, increasing to `r nice_numbers(assumed[["pct_year_last"]], suffix="%")` in the third year as a result of our marketing efforts. We also assume that our average customer will buy `r nice_numbers(assumed[["pct_demand"]], suffix="%")` of their annual apple requirements in our store. From consumer research in recent years, we know that the total annual consumption of apples per person is around `r nice_numbers(assumed[["kg_per_customer"]][["apples"]], suffix="Kg")` on average. We have an agreement with local farmers to buy apples at `r nice_numbers(assumed[["exp_per_kg"]][["apples"]], suffix="€", digits=2)` per Kg, and we calculate a selling price of `r nice_numbers(assumed[["rev_per_kg"]][["apples"]], suffix="€", digits=2)` per Kg.*
+
+Great! So how many customers can we expect if these assumptions hold?
+
+```{r}
+n_customers <- function(data, years){
+    customer_pct <- seq(
+        from=data[["pct_year_1st"]],
+        to=data[["pct_year_last"]],
+        length.out=length(years)
+    ) / 100
+    result <- round(data[["total_customers"]] * customer_pct)
+    names(result) <- years
+    return(result)
+}
+
+n_customers(data=assumed, years=2024:2026)
+```
+
+How many Kg of apples will we sell?
+
+```{r}
+kg_sale <- function(what, data, years){
+    avg_amount_total <- data[["kg_per_customer"]][[what]]
+    result <- round(
+        avg_amount_total * 
+        (data[["pct_demand"]] / 100) *
+        n_customers(data=data, years=years)
+    )
+    return(result)
+}
+
+kg_sale(what="apples", data=assumed, years=2024:2026)
+```
+
+Apple season usually is from August to November, so let's not spread this equally across the year:
+
+```{r}
+spread_sales <- function(what, distribution, data, years){
+    yearly_sales <- kg_sale(what=what, data=data, years=years)
+    distrib <- round(as.vector(sapply(
+        yearly_sales,
+        function(kg){
+            kg * distribution
+        }
+    )))
+    names(distrib) <- paste0(rep(years, each=length(distribution)), names(distribution))
+    return(distrib)
+}
+
+sales_apples_kg <- spread_sales(
+    what="apples",
+    distribution=c(
+        ".01"=0.20,
+        ".08"=0.27,
+        ".09"=0.30,
+        ".12"=0.23
+    ),
+    data=assumed,
+    years=2024:2026
+)
+
+# multiply by prices
+(sales_apples_expense <- round(sales_apples_kg * assumed[["exp_per_kg"]][["apples"]]))
+(sales_apples_revenue <- round(sales_apples_kg * assumed[["rev_per_kg"]][["apples"]]))
+```
+
+Now we apply these figures to our operations object:
+
+```{r}
+update_operations(saftladen_2024_2026) <- revenue(
+    type="Obst",
+    category="Obst",
+    name="Äpfel",
+    valid_types="Saftladen",
+    .list=as.list(sales_apples_revenue)
+)
+update_operations(saftladen_2024_2026) <- expense(
+    type="Waren",
+    category="Obst",
+    name="Äpfel",
+    valid_types="Saftladen",
+    .list=as.list(sales_apples_expense)
+)
+
+kable_bpR(
+    saftladen_2024_2026,
+    model=saftladen_inc_stamt,
+    resolution="year"
+)
+```
+
+Our previous revenues and expenses for apples have been replaced by `update_operations()`. Instead of a bunch of numbers that were hard to understand, these sales are now transparently derived from data that we have explained.
+
+
+# Discussing numbers with Shiny
+
+Finally, you can use functions like the ones we just wrote in a Shiny application. More specifically, if you don't call methods like `revenue()` or `loan()` directly, but inside a custom function, you can use the same functions in a Shiny app and in your RMarkdown document, making sure that all calculations stay in sync. That is, you write your calculations in separate R script files that can be sourced by both Shiny and RMarkdown.
+
+It can be very revealing to use such a Shiny app to examine the overall impact of changes to the numerical assumptions in your business plan. For example, you could use slider controls for each value defined in `assumed` and explore how your business would be affected if there were fewer customers than expected or if selling prices fell.
+
+We added a permalink to the Shiny app we used to discuss our business model as a team, which included all the configurable parameters. Such a Shiny permalink can be turned into a named list using `businessPlanR`'s `permalink2list()` function, which in turn makes it very easy to copy a custom configuration from Shiny into an RMarkdown document, so that all calculations and tables can be replicated.
+
+The relevant functions of the `businessPlanR` package have been designed to produce output that should be usable in HTML and LaTeX contexts, without the need to adapt the calls.
+
+```{r, reset-options, echo=FALSE, cache=FALSE}
+options(old_options)
+```
